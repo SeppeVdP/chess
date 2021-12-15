@@ -3,6 +3,7 @@ import numpy as numpy
 
 from project.chess_utilities.utility import Utility
 
+
 class ExampleUtility(Utility):
 
     def __init__(self) -> None:
@@ -62,31 +63,23 @@ class ExampleUtility(Utility):
         [-10, 0, 0, 0, 0, 0, 0, -10],
         [-20, -10, -10, -5, -5, -10, -10, -20]
     ])
-    def get_piece_position_score(board: chess.Board, givenpiece: chess.Piece, table):
+
+    def get_piece_position_score(self: chess.Board):
         white = 0
         black = 0
-        for x in range(1, 8):
+        for x in range(0, 8):
             for y in range(1, 8):
-                piece = board.piece_at(x*y)
-                if (piece != 0):
-                    if (piece.piece_type == givenpiece.piece_type):
-                        if (piece.color == givenpiece.color):
-                            white += table[x][y]
-                        else:
-                            black += table[7 - x][y]
+                piece = self.piece_at(x * y)
+                if piece != 0:
+                    if piece.color == chess.WHITE:
+                        table = str(piece.piece_type) + "_TABLE"
+                        white += table[x][y]
+                    else:
+                        black += table[7 - x][y]
         return white - black
+        # Calculate the weighted amount of white pieces minus the amount of black pieces
 
-
-
-
-    # Calculate the amount of white pieces minus the amount of black pieces    
-    def board_value(self, board: chess.Board):
-        # if winning move, take it
-        if board.is_checkmate():
-            return 999
-        position_score_queen_white = self.get_piece_position_score(givenpiece=chess.Piece(piece_type=chess.QUEEN, color=chess.WHITE), table=self.QUEEN_TABLE)
-        print(position_score_queen_white)
-        # give the board a value by amount of pieces and worth of each piece
+    def amount_of_pieces_score(self, board: chess.Board):
         n_white = 0
         n_white += len(board.pieces(piece_type=chess.PAWN, color=chess.WHITE))
         n_white += len(board.pieces(piece_type=chess.BISHOP, color=chess.WHITE)) * 3
@@ -103,4 +96,16 @@ class ExampleUtility(Utility):
         scoreAmountOfPieces = n_white - n_black
         return scoreAmountOfPieces
 
+    # Calculate the amount of white pieces minus the amount of black pieces
+    def board_value(self, board: chess.Board):
+        # if winning move, take it
+        if board.is_checkmate():
+            return 999
+        position_score_white = 0
+        position_score_white += self.get_piece_position_score(
+            givenPiece=chess.Piece(piece_type=chess.QUEEN, color=chess.WHITE), table=self.QUEEN_TABLE)
 
+        score_amount_pieces = self.amount_of_pieces_score(board)
+
+        total_score = score_amount_pieces
+        return total_score

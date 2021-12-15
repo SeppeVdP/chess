@@ -9,7 +9,7 @@ class Utility(ABC):
 
         #if winning move, take it
         if chess.Outcome.winner:
-            return 999
+                return 999
 
         #give the board a value by amount of pieces and worth of each piece
         n_white = 0

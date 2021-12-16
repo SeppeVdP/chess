@@ -1,5 +1,6 @@
 import numpy
 import chess
+import chess.svg
 
 PAWN_TABLE = numpy.array([
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -56,15 +57,15 @@ QUEEN_TABLE = numpy.array([
     [-20, -10, -10, -5, -5, -10, -10, -20]
 ])
 
-
 listoftable = {'Q': QUEEN_TABLE, "R": ROOK_TABLE, chess.BISHOP: BISHOP_TABLE,
                'N': KNIGHT_TABLE,
                chess.PAWN: PAWN_TABLE}
 
-board = chess.Board()
-piece = board.piece_at(3)
-flatqueen = QUEEN_TABLE.flatten()
-table = listoftable.get(str(piece))
-white = flatqueen[9]
-for x in range(64):
-    print(x)
+
+board = chess.Board("8/8/8/8/4N3/8/8/8 w - - 0 1")
+print(board)
+
+
+squares = board.attacks(chess.E4)
+print(len(squares))
+chess.svg.board(board, squares=squares, size=350)

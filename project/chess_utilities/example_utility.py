@@ -65,6 +65,21 @@ class ExampleUtility(Utility):
 
     def __init__(self) -> None:
         pass
+
+    def get_score_of_piece(self, value):
+        if value.upper() == 'N':
+            return 5
+        elif value.upper() == 'Q':
+            return 9
+        elif value.upper() == 'P':
+            return 1
+        elif value.upper() == 'R':
+            return 3
+        elif value.upper() == 'B':
+            return 3
+        elif value.upper() == 'K':
+            return 50
+
 #checks how many pieces can be attacked
     def get_piece_attacks(self, board: chess.Board):
         white = 0
@@ -80,7 +95,9 @@ class ExampleUtility(Utility):
                                 pieceinsquare = board.piece_at(square)
                                 if pieceinsquare is not None:
                                     if not pieceinsquare.color:
-                                        white += white + 1
+                                        piecetype = pieceinsquare
+                                        multiplier = self.get_score_of_piece(str(piecetype))
+                                        white += white + 1 * multiplier
                     else:
                         # gets location of all attackable places
                         squares = (board.attacks(x))
@@ -89,7 +106,9 @@ class ExampleUtility(Utility):
                             pieceinsquare = board.piece_at(square)
                             if pieceinsquare is not None:
                                 if pieceinsquare.color:
-                                    black += black + 1
+                                    piecetype = pieceinsquare
+                                    multiplier = self.get_score_of_piece(str(piecetype))
+                                    black += black + 1* multiplier
         return white - black
 #get a score for the position the pieces take on the scoreboard
     def get_piece_position_score(self, board: chess.Board):
@@ -130,15 +149,16 @@ class ExampleUtility(Utility):
 
     def board_value(self, board: chess.Board):
         # if winning move, take it
-        if board.is_checkmate():
-            return 999
-        score_board = self.get_piece_position_score(board)
+    #    if board.is_checkmate():
+     #       return 999
+        score_places_board = self.get_piece_position_score(board)
   #      print("score_board = " + str(score_board))
         score_amount_of_pieces = self.amount_of_pieces_score(board)
-        print("score_amount_of_pieces = " + str(score_amount_of_pieces))
+       # print("score_amount_of_pieces = " + str(score_amount_of_pieces))
 
         score_piece_attacks = self.get_piece_attacks(board)
 #        print("score_piece_attacks = " + str(score_piece_attacks))
-        total_score = score_amount_of_pieces * 3 + score_board / 10 + score_piece_attacks
-        print("total_score = " + str(total_score))
-        return score_piece_attacks
+        total_score = score_amount_of_pieces * 10 + score_places_board / 30 + score_piece_attacks/30
+#       print("score_piece_attacks = " + str(score_piece_attacks))
+      #  print("total_score = " + str(total_score))
+        return total_score,score_places_board/30,score_piece_attacks/30,score_amount_of_pieces *10

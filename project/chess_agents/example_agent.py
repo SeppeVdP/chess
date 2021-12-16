@@ -32,7 +32,13 @@ class ExampleAgent(Agent):
             # Play the move
             board.push(move)
             # Determine the value of the board after this move
-            value = flip_value * self.utility.board_value(board)
+            score,score_board,score_piece_attacks,score_amount_of_pieces = self.utility.board_value(board)
+            print("score: " + str(score))
+            print("score_board: " + str(score_board))
+            print("score_piece_attacks: " + str(score_piece_attacks))
+            print("score_amount_of_pieces: " + str(score_amount_of_pieces))
+           # value = flip_value * self.utility.board_value(board)
+            value = flip_value * score
             # If this is better than all other previous moves, store this move and its utility
             if value > best_utility:
                 best_move = move

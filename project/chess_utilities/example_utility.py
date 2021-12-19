@@ -149,16 +149,15 @@ class ExampleUtility(Utility):
 
     def board_value(self, board: chess.Board):
         # if winning move, take it
-    #    if board.is_checkmate():
-     #       return 999
+
         score_places_board = self.get_piece_position_score(board)
-  #      print("score_board = " + str(score_board))
+#      print("score_board = " + str(score_board))
         score_amount_of_pieces = self.amount_of_pieces_score(board)
-       # print("score_amount_of_pieces = " + str(score_amount_of_pieces))
+#        print("score_amount_of_pieces = " + str(score_amount_of_pieces))
 
         score_piece_attacks = self.get_piece_attacks(board)
-#        print("score_piece_attacks = " + str(score_piece_attacks))
-        total_score = score_amount_of_pieces * 10 + score_places_board / 30 + score_piece_attacks/30
+#       print("score_piece_attacks = " + str(score_piece_attacks))
+        total_score = score_amount_of_pieces*25 + score_places_board / 40 + score_piece_attacks / 40
 #       print("score_piece_attacks = " + str(score_piece_attacks))
       #  print("total_score = " + str(total_score))
-        return total_score,score_places_board/30,score_piece_attacks/30,score_amount_of_pieces *10
+        return total_score

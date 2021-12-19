@@ -1,6 +1,7 @@
 import numpy
 import chess
 import chess.svg
+import random
 
 PAWN_TABLE = numpy.array([
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -57,15 +58,51 @@ QUEEN_TABLE = numpy.array([
     [-20, -10, -10, -5, -5, -10, -10, -20]
 ])
 
-listoftable = {'Q': QUEEN_TABLE, "R": ROOK_TABLE, chess.BISHOP: BISHOP_TABLE,
+listoftable = {'Q': QUEEN_TABLE, "R": ROOK_TABLE, 'B': BISHOP_TABLE,
                'N': KNIGHT_TABLE,
-               chess.PAWN: PAWN_TABLE}
+               'P': PAWN_TABLE}
 
 
-board = chess.Board("8/8/8/8/4N3/8/8/8 w - - 0 1")
+def get_piece_position_score(board: chess.Board):
+    white = 0
+    black = 0
+    for x in range(64):
+        piece = board.piece_at(x)
+        if piece is not None:
+            table = listoftable.get(str(piece).upper())
+            if table is not None:
+                table2 = table.flatten()
+                table2 = numpy.flip(table2)
+                if piece.color == True:
+                    white += table2[x]
+                elif  piece.color == False:
+                    black += table2[63 - x]
+    return white - black
+
+
+#board = chess.Board("r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4")
+board = chess.Board()
+moves = list(board.legal_moves)
+for i in range(35):
+    moves = list(board.legal_moves)
+    choice = random.randint(0, 3)
+    board.push(moves[choice])
+    print(board)
+    print("score" + str(i) + ": " + str(get_piece_position_score(board)))
+    print("===========")
+
+
+"""
+print("score1: " + str(get_piece_position_score(board)))
+board.push(moves[2])
+score = get_piece_position_score(board)
 print(board)
-
-
+print("score2: " + str(get_piece_position_score(board)))
 squares = board.attacks(chess.E4)
-print(len(squares))
-chess.svg.board(board, squares=squares, size=350)
+print(board.attackers(chess.WHITE, chess.E8))
+piece = board.piece_at(53)
+print(piece.color)
+print(chess.piece_name(piece.piece_type))
+table = numpy.flip(ROOK_TABLE.flatten())
+
+print(table[55])"""

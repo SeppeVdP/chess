@@ -18,7 +18,7 @@ class ExampleAgent(Agent):
         if depth == 0:
             return self.utility.board_value(board)
 
-        if maximizingPlayer:
+        if maximizingPlayer == True:
             maxEval = -9999
             for move in list(board.legal_moves):
                 board.push(move)
@@ -27,8 +27,8 @@ class ExampleAgent(Agent):
                 maxEval = max(eval, maxEval)
             return maxEval
 
-        else:
-            minEval = +9999
+        elif maximizingPlayer == False:
+            minEval = 9999
             for move in list(board.legal_moves):
                 board.push(move)
                 eval = self.minimax(board, depth - 1, True)
@@ -36,17 +36,53 @@ class ExampleAgent(Agent):
                 minEval = min(eval, minEval)
             return minEval
 
+    def minimaxprune(self, board, depth, maximizingPlayer, alpha, beta):
+        if depth == 0 | board.is_stalemate() | board.is_checkmate():
+            return self.utility.board_value(board)
+
+        if maximizingPlayer:
+            maxEval = -9999
+            for move in list(board.legal_moves):
+                board.push(move)
+                eval = self.minimaxprune(board, depth - 1, False, alpha, beta)
+                board.pop()
+                maxEval = max(eval, maxEval)
+                alpha = max(alpha, eval)
+                if beta <= alpha:
+                    break
+            return maxEval
+
+        else:
+            minEval = +9999
+            for move in list(board.legal_moves):
+                board.push(move)
+                eval = self.minimaxprune(board, depth - 1, True, alpha, beta)
+                board.pop()
+                minEval = min(eval, minEval)
+                beta = min(beta, eval)
+                if beta <= alpha:
+                    break
+            return minEval
+
 
     def calculate_move(self, board: chess.Board):
         start_time = time.time()
 
         # If the agent is playing as black, the utility values are flipped (negative-positive)
-        flip_value = 1 if board.turn == chess.WHITE else -1
+        if board.turn == chess.WHITE:
+            flip_value = 1
+            maximazingplayer = True
+        else:
+            flip_value = -1
+            maximazingplayer = False
+
 
         best_move = random.sample(list(board.legal_moves), 1)[0]
-        best_utility = 0
+        best_utility = -9999
         # Loop trough all legal moves
+        valuelist = []
         for move in list(board.legal_moves):
+
             # Check if the maximum calculation time for this move has been reached
          #   if time.time() - start_time > self.time_limit_move:
           #      print("time limit reached")
@@ -54,13 +90,16 @@ class ExampleAgent(Agent):
             # Play the move
             board.push(move)
             # Determine the value of the board after this move
-            value = flip_value * self.minimax(board, 2, True)
+            value = self.minimaxprune(board, 2, False,-9999,9999)
+            valuelist.append(round(value, 2))
             # If this is better than all other previous moves, store this move and its utility
             if value > best_utility:
                 best_move = move
                 best_utility = value
             # Revert the board to its original state
             board.pop()
+        print(valuelist)
+        print("best utility: " + str(best_utility))
         return best_move
 """
 

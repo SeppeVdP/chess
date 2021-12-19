@@ -108,7 +108,38 @@ class ExampleUtility(Utility):
                                 if pieceinsquare.color:
                                     piecetype = pieceinsquare
                                     multiplier = self.get_score_of_piece(str(piecetype))
-                                    black += black + 1* multiplier
+                                    black += black + 1 * multiplier
+        return white - black
+
+        # checks how many pieces can be attacked
+    def get_piece_defend(self, board: chess.Board):
+        white = 0
+        black = 0
+        for x in range(64):
+            piece = board.piece_at(x)
+            if piece is not None:
+                if piece.color:
+                    # gets location of all attackable places
+                    squares = (board.attacks(x))
+                    # checks white is at attackable squares
+                    for square in squares:
+                        pieceinsquare = board.piece_at(square)
+                        if pieceinsquare is not None:
+                            if pieceinsquare.color:
+                                piecetype = pieceinsquare
+                                multiplier = self.get_score_of_piece(str(piecetype))
+                                white += white + 1 * multiplier
+                else:
+                    # gets location of all attackable places
+                    squares = (board.attacks(x))
+                    # checks if enemy is at attackable squares
+                    for square in squares:
+                        pieceinsquare = board.piece_at(square)
+                        if pieceinsquare is not None:
+                            if not pieceinsquare.color:
+                                piecetype = pieceinsquare
+                                multiplier = self.get_score_of_piece(str(piecetype))
+                                black += black + 1 * multiplier
         return white - black
 #get a score for the position the pieces take on the scoreboard
     def get_piece_position_score(self, board: chess.Board):
@@ -116,14 +147,14 @@ class ExampleUtility(Utility):
         black = 0
         for x in range(64):
             piece = board.piece_at(x)
-            if piece is not None :
-                table = listoftable.get(str(piece))
+            if piece is not None:
+                table = listoftable.get(str(piece).upper())
                 if table is not None:
                     table2 = table.flatten()
-                    if piece.color:
-                            white += table2[x]
-                    else:
-                        black += table2[7 - x]
+                    if piece.color == True:
+                        white += table2[x]
+                    elif piece.color == False:
+                        black += table2[63 - x]
         return white - black
 
 #Calculate the weighted amount of white pieces minus the amount of black pieces
@@ -156,8 +187,12 @@ class ExampleUtility(Utility):
 #        print("score_amount_of_pieces = " + str(score_amount_of_pieces))
 
         score_piece_attacks = self.get_piece_attacks(board)
+        score_piece_defends = self.get_piece_defend(board)
 #       print("score_piece_attacks = " + str(score_piece_attacks))
-        total_score = score_amount_of_pieces*25 + score_places_board / 40 + score_piece_attacks / 40
+        if board.ply()%3 == 0:
+            total_score = score_amount_of_pieces * 20 + score_places_board / 50
+        else:
+          total_score = score_amount_of_pieces*20
 #       print("score_piece_attacks = " + str(score_piece_attacks))
       #  print("total_score = " + str(total_score))
         return total_score

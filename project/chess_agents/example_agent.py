@@ -15,7 +15,7 @@ class ExampleAgent(Agent):
 
 
     def minimax(self,board, depth, maximizingPlayer):
-        if depth == 0:
+        if depth == 0 | board.is_checkmate():
             return self.utility.board_value(board)
 
         if maximizingPlayer == True:
@@ -37,7 +37,7 @@ class ExampleAgent(Agent):
             return minEval
 
     def minimaxprune(self, board, depth, maximizingPlayer, alpha, beta):
-        if depth == 0 | board.is_stalemate() | board.is_checkmate():
+        if depth == 0 | board.is_checkmate():
             return self.utility.board_value(board)
 
         if maximizingPlayer:
@@ -90,7 +90,7 @@ class ExampleAgent(Agent):
             # Play the move
             board.push(move)
             # Determine the value of the board after this move
-            value = self.minimaxprune(board, 2, False,-9999,9999)
+            value = self.minimaxprune(board, 2, False, -9999, 9999)
             valuelist.append(round(value, 2))
             # If this is better than all other previous moves, store this move and its utility
             if value > best_utility:

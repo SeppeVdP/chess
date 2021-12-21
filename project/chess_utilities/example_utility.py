@@ -4,8 +4,8 @@ import numpy as numpy
 from project.chess_utilities.utility import Utility
 PAWN_TABLE = numpy.array([
     [0, 0, 0, 0, 0, 0, 0, 0],
-    [5, 10, 10, -20, -20, 10, 10, 5],
-    [5, -5, -10, 0, 0, -10, -5, 5],
+    [-5, -10, -10, -100, -50, -10, -10, -5],
+    [5, -5, -10, 10, 30, -10, -5, 5],
     [0, 0, 0, 20, 20, 0, 0, 0],
     [5, 5, 10, 25, 25, 10, 5, 5],
     [10, 10, 20, 30, 30, 20, 10, 10],
@@ -97,7 +97,7 @@ class ExampleUtility(Utility):
                                     if not pieceinsquare.color:
                                         piecetype = pieceinsquare
                                         multiplier = self.get_score_of_piece(str(piecetype))
-                                        white += white + 1 * multiplier
+                                        white += 1 * multiplier
                     else:
                         # gets location of all attackable places
                         squares = (board.attacks(x))
@@ -108,7 +108,7 @@ class ExampleUtility(Utility):
                                 if pieceinsquare.color:
                                     piecetype = pieceinsquare
                                     multiplier = self.get_score_of_piece(str(piecetype))
-                                    black += black + 1 * multiplier
+                                    black += 1  * multiplier
         return white - black
 
         # checks how many pieces can be attacked
@@ -117,29 +117,23 @@ class ExampleUtility(Utility):
         black = 0
         for x in range(64):
             piece = board.piece_at(x)
+            # gets location of all attackable places
+            squares = (board.attacks(x))
             if piece is not None:
                 if piece.color:
-                    # gets location of all attackable places
-                    squares = (board.attacks(x))
                     # checks white is at attackable squares
                     for square in squares:
                         pieceinsquare = board.piece_at(square)
                         if pieceinsquare is not None:
                             if pieceinsquare.color:
-                                piecetype = pieceinsquare
-                                multiplier = self.get_score_of_piece(str(piecetype))
-                                white += white + 1 * multiplier
+                                white += 1
                 else:
-                    # gets location of all attackable places
-                    squares = (board.attacks(x))
                     # checks if enemy is at attackable squares
                     for square in squares:
                         pieceinsquare = board.piece_at(square)
                         if pieceinsquare is not None:
                             if not pieceinsquare.color:
-                                piecetype = pieceinsquare
-                                multiplier = self.get_score_of_piece(str(piecetype))
-                                black += black + 1 * multiplier
+                                black += 1
         return white - black
 #get a score for the position the pieces take on the scoreboard
     def get_piece_position_score(self, board: chess.Board):
@@ -189,10 +183,10 @@ class ExampleUtility(Utility):
         score_piece_attacks = self.get_piece_attacks(board)
         score_piece_defends = self.get_piece_defend(board)
 #       print("score_piece_attacks = " + str(score_piece_attacks))
-        if board.ply()%3 == 0:
-            total_score = score_amount_of_pieces * 20 + score_places_board / 50
-        else:
-          total_score = score_amount_of_pieces*20
+       # if board.ply()%3 == 0:
+        #    total_score = score_amount_of_pieces * 20 + score_places_board / 50
+        #else:
+        total_score = score_amount_of_pieces * 25 + score_places_board / 50 + score_piece_defends / 20 + score_piece_attacks / 70
 #       print("score_piece_attacks = " + str(score_piece_attacks))
       #  print("total_score = " + str(total_score))
         return total_score

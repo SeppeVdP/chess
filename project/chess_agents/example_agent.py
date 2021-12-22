@@ -64,6 +64,73 @@ class ExampleAgent(Agent):
                     break
             return minEval
 
+    def minimaxprune_quiescence(self, board, depth, maximizingPlayer, alpha, beta):
+        if board.is_checkmate():
+            return self.utility.board_value(board)
+        elif depth == 0:
+            if self.check_under_attack(board, maximizingPlayer):
+                return self.quiescence_search(board, 3, maximizingPlayer)
+            else:
+                return self.utility.board_value(board)
+        if maximizingPlayer:
+            maxEval = -9999
+            for move in list(board.legal_moves):
+                board.push(move)
+                eval = self.minimaxprune(board, depth - 1, False, alpha, beta)
+                board.pop()
+                maxEval = max(eval, maxEval)
+                alpha = max(alpha, eval)
+                if beta <= alpha:
+                    break
+            return maxEval
+
+        else:
+            minEval = +9999
+            for move in list(board.legal_moves):
+                board.push(move)
+                eval = self.minimaxprune(board, depth - 1, True, alpha, beta)
+                board.pop()
+                minEval = min(eval, minEval)
+                beta = min(beta, eval)
+                if beta <= alpha:
+                    break
+            return minEval
+
+    def check_under_attack(self, board, maximizingplayer):
+        #go through whole board looking for pieces
+        for square in range(64):
+            piece = board.piece_at(square)
+            # check if piece exists at position
+            if piece is not None:
+                if piece.color == maximizingplayer:
+                    if board.is_attacked_by(not maximizingplayer, square):
+                        print(piece)
+                        return True
+
+    def quiescence_search(self, board, depth, maximizingPlayer):
+        if not self.check_under_attack(board, maximizingPlayer) | depth == 0 | board.is_checkmate():
+            return self.utility.board_value(board)
+        else:
+            if maximizingPlayer:
+                maxEval = -9999
+                for move in list(board.legal_moves):
+                    board.push(move)
+                    eval = self.quiescence_search(board, depth - 1, not maximizingPlayer)
+                    board.pop()
+                    maxEval = max(eval, maxEval)
+                return maxEval
+            else:
+                minEval = +9999
+                for move in list(board.legal_moves):
+                    board.push(move)
+                    eval = self.quiescence_search(board, depth - 1, maximizingPlayer)
+                    board.pop()
+                    minEval = min(eval, minEval)
+                return minEval
+
+
+
+
 
     def calculate_move(self, board: chess.Board):
         start_time = time.time()
@@ -83,14 +150,14 @@ class ExampleAgent(Agent):
         valuelist = []
         for move in list(board.legal_moves):
 
-            # Check if the maximum calculation time for this move has been reached
-         #   if time.time() - start_time > self.time_limit_move:
-          #      print("time limit reached")
-           #     break
+        # Check if the maximum calculation time for this move has been reached
+            if time.time() - start_time > self.time_limit_move:
+                print("time limit reached")
+                break
             # Play the move
             board.push(move)
             # Determine the value of the board after this move
-            value = self.minimaxprune(board, 2, False, -9999, 9999)
+            value = self.minimaxprune_quiescence(board, 2, False, -9999, 9999)
             valuelist.append(round(value, 2))
             # If this is better than all other previous moves, store this move and its utility
             if value > best_utility:
@@ -99,7 +166,8 @@ class ExampleAgent(Agent):
             # Revert the board to its original state
             board.pop()
         print(valuelist)
-        print("best utility: " + str(best_utility))
+        print("best utility: " + str(best_utility) + " Time: " + str(time.time() - start_time))
+        print("Move: " + str(best_move))
         return best_move
 """
 

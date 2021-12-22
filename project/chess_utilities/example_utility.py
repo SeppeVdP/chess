@@ -4,7 +4,7 @@ import numpy as numpy
 from project.chess_utilities.utility import Utility
 PAWN_TABLE = numpy.array([
     [0, 0, 0, 0, 0, 0, 0, 0],
-    [-5, -10, -10, -100, -50, -10, -10, -5],
+    [-5, -30, -40, -70, -50, -40, -30, -5],
     [5, -5, -10, 10, 30, -10, -5, 5],
     [0, 0, 0, 20, 20, 0, 0, 0],
     [5, 5, 10, 25, 25, 10, 5, 5],
@@ -80,13 +80,29 @@ class ExampleUtility(Utility):
         elif value.upper() == 'K':
             return 50
 
+    def get_squares_covered(self, board: chess.Board):
+        white = 0
+        black = 0
+        for x in range(64):
+            piece = board.piece_at(x)
+            if piece is not None:
+                    if piece.color:
+                            #gets amount of covered places
+                            squares = len(board.attacks(x))
+                            white += squares
+                    else:
+                        # gets amount of covered places
+                        squares = len(board.attacks(x))
+                        black += squares
+        return white - black
+
 #checks how many pieces can be attacked
     def get_piece_attacks(self, board: chess.Board):
         white = 0
         black = 0
         for x in range(64):
             piece = board.piece_at(x)
-            if piece is not None :
+            if piece is not None:
                     if piece.color:
                             #gets location of all attackable places
                             squares = (board.attacks(x))
@@ -111,7 +127,7 @@ class ExampleUtility(Utility):
                                     black += 1  * multiplier
         return white - black
 
-        # checks how many pieces can be attacked
+# checks how many pieces are protected
     def get_piece_defend(self, board: chess.Board):
         white = 0
         black = 0
@@ -174,19 +190,18 @@ class ExampleUtility(Utility):
 
     def board_value(self, board: chess.Board):
         # if winning move, take it
-
-        score_places_board = self.get_piece_position_score(board)
-#      print("score_board = " + str(score_board))
-        score_amount_of_pieces = self.amount_of_pieces_score(board)
-#        print("score_amount_of_pieces = " + str(score_amount_of_pieces))
-
-        score_piece_attacks = self.get_piece_attacks(board)
-        score_piece_defends = self.get_piece_defend(board)
-#       print("score_piece_attacks = " + str(score_piece_attacks))
-       # if board.ply()%3 == 0:
-        #    total_score = score_amount_of_pieces * 20 + score_places_board / 50
-        #else:
-        total_score = score_amount_of_pieces * 25 + score_places_board / 50 + score_piece_defends / 20 + score_piece_attacks / 70
-#       print("score_piece_attacks = " + str(score_piece_attacks))
-      #  print("total_score = " + str(total_score))
+        if board.is_checkmate():
+            return 9999999
+        else:
+            score_places_board = self.get_piece_position_score(board)
+    #       print("score_board = " + str(score_board))
+            score_amount_of_pieces = self.amount_of_pieces_score(board)
+    #       print("score_amount_of_pieces = " + str(score_amount_of_pieces))
+            score_squares_covered = self.get_squares_covered(board)
+#            score_piece_attacks = self.get_piece_attacks(board)
+            score_piece_defends = self.get_piece_defend(board)
+    #       print("score_piece_attacks = " + str(score_piece_attacks))
+            total_score = score_amount_of_pieces * 25 + score_places_board / 50 + score_squares_covered / 50 + score_piece_defends / 30
+    #       print("score_piece_attacks = " + str(score_piece_attacks))
+          #  print("total_score = " + str(total_score))
         return total_score

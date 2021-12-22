@@ -77,6 +77,7 @@ def get_score_of_piece(value):
     elif value.upper() == 'K':
         return 10
 
+
 def get_piece_defend(board: chess.Board):
     white = 0
     black = 0
@@ -91,8 +92,8 @@ def get_piece_defend(board: chess.Board):
                     pieceinsquare = board.piece_at(square)
                     if pieceinsquare is not None:
                         if pieceinsquare.color:
-#                           piecetype = pieceinsquare
-#                           multiplier = get_score_of_piece(str(piecetype))
+                            #                           piecetype = pieceinsquare
+                            #                           multiplier = get_score_of_piece(str(piecetype))
                             white += 1
             else:
                 # checks if enemy is at attackable squares
@@ -100,9 +101,9 @@ def get_piece_defend(board: chess.Board):
                     pieceinsquare = board.piece_at(square)
                     if pieceinsquare is not None:
                         if not pieceinsquare.color:
-#                         piecetype = pieceinsquare
-#                         multiplier = get_score_of_piece(str(piecetype))
-                         black += 1
+                            #                         piecetype = pieceinsquare
+                            #                         multiplier = get_score_of_piece(str(piecetype))
+                            black += 1
     print("white: " + str(white))
     print("black: " + str(black))
     return white - black
@@ -153,34 +154,67 @@ def get_piece_position_score(board: chess.Board):
                 table2 = numpy.flip(table2)
                 if piece.color == True:
                     white += table2[x]
-                elif  piece.color == False:
+                elif piece.color == False:
                     black += table2[63 - x]
     return white - black
 
 
+def check_under_attack(board, maximizingplayer):
+    # go through whole board looking for pieces
+ for square in range(64):
+    piece = board.piece_at(square)
+    # check if piece exists at position
+    if piece is not None:
+        if piece.color == maximizingplayer:
+            if board.is_attacked_by(not maximizingplayer, square):
+                print(piece)
+                return True
+def get_squares_covered(board: chess.Board):
+    white = 0
+    black = 0
+    for x in range(64):
+        piece = board.piece_at(x)
+        if piece is not None:
+                if piece.color:
+                        #gets amount of covered places
+                        squares = len(board.attacks(x))
+                        white += squares
+                else:
+                    # gets amount of covered places
+                    squares = len(board.attacks(x))
+                    black += squares
+    return white - black
+
 #board = chess.Board("r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq -  4")
 board = chess.Board("rnb1k2r/ppp2ppp/5n2/3q4/1b1P4/2N5/PP3PPP/R1BQKBNR w KQkq - 3 7")
 print(board)
-direction = board.attacks(35)
+direction = get_squares_covered(board)
 print(direction)
-#board = chess.Board()
-#moves = list(board.legal_moves)
-#for i in range(35):
- #   moves = list(board.legal_moves)
-  #  choice = random.randint(0, 3)
-  #  board.push(moves[choice])
+#print(check_under_attack(board, False))
+# board = chess.Board()
 
-    #print("score" + str(i) + ": " + str(get_piece_position_score(board)))
+for i in range(4):
+    moves = list(board.legal_moves)
+    choice = random.randint(1, 3)
+    board.push(moves[1])
+    print(moves[1])
+    print(board)
+    direction = get_squares_covered(board)
+    print(direction)
+    print("-----------")
+
+# print("score" + str(i) + ": " + str(get_piece_position_score(board)))
 
 
+# print("score1: " + str(get_piece_position_score(board)))
+# board.push(moves[2])
+# score = get_piece_position_score(board)
 
-#print("score1: " + str(get_piece_position_score(board)))
-#board.push(moves[2])
-#score = get_piece_position_score(board)
 """print(board)
 squares = board.king(False)
-print(get_piece_attacks(board))"""
-""""print("score2: " + str(get_piece_position_score(board)))
+print(get_piece_attacks(board))
+print("score2: " + str(get_piece_position_score(board)))
 squares = board.attacks(chess.E4)
 print(board.attackers(chess.WHITE, chess.E8))
-piece = board.piece_at(53)"""
+piece = board.piece_at(53)
+"""

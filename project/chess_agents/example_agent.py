@@ -69,7 +69,7 @@ class ExampleAgent(Agent):
             return self.utility.board_value(board)
         elif depth == 0:
             if self.check_under_attack(board, maximizingPlayer):
-                return self.quiescence_search(board, 3, maximizingPlayer)
+                return self.quiescence_search(board, 5, maximizingPlayer)
             else:
                 return self.utility.board_value(board)
         if maximizingPlayer:
@@ -149,7 +149,6 @@ class ExampleAgent(Agent):
         # Loop trough all legal moves
         valuelist = []
         for move in list(board.legal_moves):
-
         # Check if the maximum calculation time for this move has been reached
             if time.time() - start_time > self.time_limit_move:
                 print("time limit reached")
@@ -166,7 +165,7 @@ class ExampleAgent(Agent):
             # Revert the board to its original state
             board.pop()
         print(valuelist)
-        print("best utility: " + str(best_utility) + " Time: " + str(time.time() - start_time))
+        print("best utility: " + str(round(best_utility,2)) + " Time: " + str(round(time.time() - start_time, 2)))
         print("Move: " + str(best_move))
         return best_move
 """

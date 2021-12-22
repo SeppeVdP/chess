@@ -80,11 +80,83 @@ class ExampleUtility(Utility):
         elif value.upper() == 'K':
             return 50
 
+    def get_pieces_squares_covered_combined(self, board: chess.Board):
+        whitesquarescovered = 0
+        blacksquarescovered = 0
+        whiteattacks = 0
+        blackattacks = 0
+        whitedefend = 0
+        blackdefend = 0
+        whiteposition = 0
+        blackposition = 0
+
+        for x in range(64):
+            piece = board.piece_at(x)
+            if piece is not None:
+                table = listoftable.get(str(piece).upper())
+                # position score
+                if table is not None:
+                    tableflattend = table.flatten()
+                    if piece.color:
+                        whiteposition += tableflattend[x]
+                    elif not piece.color:
+                        blackposition += tableflattend[63 - x]
+                # amount of squares covered by piece
+                squarescovered = len(board.attacks(x))
+                # amount of attacked/defended squares
+                # gets location and pieces of all attackable places
+                squaresattack = (board.attacks(x))
+                for square in squaresattack:
+                    pieceinsquareattack = board.piece_at(square)
+                    if pieceinsquareattack is not None:
+                        if piece.color:
+                            if not pieceinsquareattack.color:
+                                piecetype = pieceinsquareattack
+                                multiplier = self.get_score_of_piece(str(piecetype))
+                                whiteattacks += 1 * multiplier
+                            else:
+                                whitedefend += 1
+                        else:
+                            if pieceinsquareattack.color:
+                                piecetype = pieceinsquareattack
+                                multiplier = self.get_score_of_piece(str(piecetype))
+                                blackattacks += 1 * multiplier
+                            else:
+                                blackdefend += 1
+                # for squares covered
+                if piece.color:
+                    # gets amount of covered places
+                    whitesquarescovered += squarescovered
+                else:
+                    # gets amount of covered places
+                    blacksquarescovered += squarescovered
+
+        squarescoveredscore = whitesquarescovered - blacksquarescovered
+        positionscore = whiteposition - blackposition
+        defendscore = whitedefend - blackdefend
+        attackscore = whiteattacks - blackattacks
+        """        
+        print("squarescoveredscore= " + str(squarescoveredscore))
+        print("positionscore= " + str(positionscore))
+        print("defendscore= " + str(defendscore))
+        print("attackscore= " + str(attackscore))
+        totalscore = attackscore + defendscore + positionscore / 50 + squarescoveredscore / 3
+        print("totaalscore= " + str(totalscore))
+        """
+        #totalscore = attackscore / 30 + defendscore / 20 + positionscore / 60 + squarescoveredscore / 3  # heeft 1 win gefixed
+        totalscore = attackscore / 35 + defendscore / 20 + positionscore / 65 + squarescoveredscore / 3
+
+
+        return totalscore
+
+
     def get_squares_covered(self, board: chess.Board):
         white = 0
         black = 0
         for x in range(64):
             piece = board.piece_at(x)
+            squares = len(board.attacks(x))
+
             if piece is not None:
                     if piece.color:
                             #gets amount of covered places
@@ -193,15 +265,7 @@ class ExampleUtility(Utility):
         if board.is_checkmate():
             return 9999999
         else:
-            score_places_board = self.get_piece_position_score(board)
-    #       print("score_board = " + str(score_board))
             score_amount_of_pieces = self.amount_of_pieces_score(board)
-    #       print("score_amount_of_pieces = " + str(score_amount_of_pieces))
-            score_squares_covered = self.get_squares_covered(board)
-#            score_piece_attacks = self.get_piece_attacks(board)
-            score_piece_defends = self.get_piece_defend(board)
-    #       print("score_piece_attacks = " + str(score_piece_attacks))
-            total_score = score_amount_of_pieces * 25 + score_places_board / 50 + score_squares_covered / 50 + score_piece_defends / 30
-    #       print("score_piece_attacks = " + str(score_piece_attacks))
-          #  print("total_score = " + str(total_score))
+            score_attacks_defends_covered_combined = self.get_pieces_squares_covered_combined(board)
+            total_score = score_amount_of_pieces * 25 + score_attacks_defends_covered_combined
         return total_score
